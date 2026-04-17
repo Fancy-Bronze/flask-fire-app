@@ -14,7 +14,7 @@ import tensorflow as tf
 from tensorflow import keras
 
 print("TensorFlow version:", tf.__version__)
-print("Keras version:     ", keras.__version__)
+print("Keras version:     ", tf.__version__)
 
 import numpy as np
 import pandas as pd
