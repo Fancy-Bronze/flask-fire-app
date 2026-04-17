@@ -74,13 +74,14 @@ class LabForm(FlaskForm):
 #  앱 시작 시 파이프라인 & 모델 로드
 #  (full_pipeline.pkl 이 없으면 CSV에서 재학습)
 # ──────────────────────────────────────────────
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-CSV_PATH   = os.path.join(BASE_DIR, 'sanbul2district-divby100.csv')
-MODEL_PATH = os.path.join(BASE_DIR, 'fires_model.h5')
-PIPE_PATH  = os.path.join(BASE_DIR, 'full_pipeline.pkl')
+BASE_DIR     = os.path.dirname(os.path.abspath(__file__))
+CSV_PATH     = os.path.join(BASE_DIR, 'sanbul2district-divby100.csv')
+WEIGHTS_PATH = os.path.join(BASE_DIR, 'fires_model_weights.weights.h5')
+PIPE_PATH    = os.path.join(BASE_DIR, 'full_pipeline.pkl')
 
 NUM_ATTRIBS = ['longitude', 'latitude', 'avg_temp', 'max_temp', 'max_wind_speed', 'avg_wind']
 CAT_ATTRIBS = ['month', 'day']
+INPUT_DIM   = 26  # 6 수치형 + 12 month 원핫 + 8 day 원핫
 
 
 def build_pipeline(csv_path):
@@ -103,6 +104,17 @@ def build_pipeline(csv_path):
     return full_pipeline
 
 
+def build_keras_model(input_dim):
+    """Keras 버전에 무관하게 코드로 모델 아키텍처를 재구성합니다."""
+    m = keras.models.Sequential([
+        keras.layers.Dense(30, activation='relu', input_shape=(input_dim,)),
+        keras.layers.Dense(30, activation='relu'),
+        keras.layers.Dense(30, activation='relu'),
+        keras.layers.Dense(1)
+    ])
+    return m
+
+
 # 파이프라인 로드 or 생성
 if os.path.exists(PIPE_PATH):
     print("파이프라인 로드:", PIPE_PATH)
@@ -115,13 +127,14 @@ else:
     full_pipeline = None
     print("경고: full_pipeline.pkl 과 CSV 파일이 모두 없습니다.")
 
-# 모델 로드
-if os.path.exists(MODEL_PATH):
-    print("모델 로드:", MODEL_PATH)
-    model = keras.models.load_model(MODEL_PATH)
+# 모델 로드 (weights만 로드 → Keras 버전 무관)
+if os.path.exists(WEIGHTS_PATH):
+    print("모델 weights 로드:", WEIGHTS_PATH)
+    model = build_keras_model(INPUT_DIM)
+    model.load_weights(WEIGHTS_PATH)
 else:
     model = None
-    print("경고: fires_model.keras 파일이 없습니다. 먼저 sanbul_step1_2.py 를 실행하세요.")
+    print("경고: fires_model_weights.weights.h5 없습니다. 먼저 sanbul_step1_2.py 를 실행하세요.")
 
 
 # ──────────────────────────────────────────────
