@@ -134,6 +134,9 @@ if os.path.exists(WEIGHTS_PATH):
     weights = [data[f'arr_{i}'] for i in range(len(data.files))]
     model = build_keras_model(INPUT_DIM)
     model.set_weights(weights)
+    # 첫 predict() 시 TF 그래프 컴파일로 인한 timeout 방지용 사전 워밍업
+    model.predict(np.zeros((1, INPUT_DIM)), verbose=0)
+    print("모델 워밍업 완료")
 else:
     model = None
     print("경고: fires_model_weights.npz 없습니다. 먼저 sanbul_step1_2.py 를 실행하세요.")
