@@ -1,3 +1,4 @@
 full_pipeline.pkl
 fires_model.keras
 fires_model.h5
+fires_model_weights.weights.h5

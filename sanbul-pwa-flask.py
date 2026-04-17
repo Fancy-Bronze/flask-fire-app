@@ -76,7 +76,7 @@ class LabForm(FlaskForm):
 # ──────────────────────────────────────────────
 BASE_DIR     = os.path.dirname(os.path.abspath(__file__))
 CSV_PATH     = os.path.join(BASE_DIR, 'sanbul2district-divby100.csv')
-WEIGHTS_PATH = os.path.join(BASE_DIR, 'fires_model_weights.weights.h5')
+WEIGHTS_PATH = os.path.join(BASE_DIR, 'fires_model_weights.npz')
 PIPE_PATH    = os.path.join(BASE_DIR, 'full_pipeline.pkl')
 
 NUM_ATTRIBS = ['longitude', 'latitude', 'avg_temp', 'max_temp', 'max_wind_speed', 'avg_wind']
@@ -127,14 +127,16 @@ else:
     full_pipeline = None
     print("경고: full_pipeline.pkl 과 CSV 파일이 모두 없습니다.")
 
-# 모델 로드 (weights만 로드 → Keras 버전 무관)
+# 모델 로드 (numpy 배열로 저장된 weights → Keras 버전 완전 무관)
 if os.path.exists(WEIGHTS_PATH):
     print("모델 weights 로드:", WEIGHTS_PATH)
+    data = np.load(WEIGHTS_PATH)
+    weights = [data[f'arr_{i}'] for i in range(len(data.files))]
     model = build_keras_model(INPUT_DIM)
-    model.load_weights(WEIGHTS_PATH)
+    model.set_weights(weights)
 else:
     model = None
-    print("경고: fires_model_weights.weights.h5 없습니다. 먼저 sanbul_step1_2.py 를 실행하세요.")
+    print("경고: fires_model_weights.npz 없습니다. 먼저 sanbul_step1_2.py 를 실행하세요.")
 
 
 # ──────────────────────────────────────────────
