@@ -76,7 +76,7 @@ class LabForm(FlaskForm):
 # ──────────────────────────────────────────────
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CSV_PATH   = os.path.join(BASE_DIR, 'sanbul2district-divby100.csv')
-MODEL_PATH = os.path.join(BASE_DIR, 'fires_model.keras')
+MODEL_PATH = os.path.join(BASE_DIR, 'fires_model.h5')
 PIPE_PATH  = os.path.join(BASE_DIR, 'full_pipeline.pkl')
 
 NUM_ATTRIBS = ['longitude', 'latitude', 'avg_temp', 'max_temp', 'max_wind_speed', 'avg_wind']
